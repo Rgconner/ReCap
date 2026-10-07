@@ -1,0 +1,9 @@
+# ReCap setup companion app — runs on a PC (Windows/Linux/Mac), not the Pi.
+fastapi==0.141.1
+starlette==1.4.1
+uvicorn==0.52.1
+opencv-python-headless==5.0.0.93
+numpy==2.5.2
+
+# Dev/test only
+pytest==9.1.1

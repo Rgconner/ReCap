@@ -1,0 +1,12 @@
+# ReCap S1 primer-detection spike — deploys to the Pi Zero 2 W.
+opencv-python-headless==5.0.0.93
+numpy==2.5.2
+
+# Dev/test only
+pytest==9.1.1
+
+# Pi-hardware-only, not installable off-device: main.py needs
+# RPi.GPIO, which requires actual GPIO hardware headers. Install it
+# separately on the Pi itself (usually preinstalled on Pi OS, or
+# `sudo apt install python3-rpi.gpio`) — leave it out of this file so
+# `pip install -r requirements.txt` still works on a dev machine.

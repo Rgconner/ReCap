@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Spike S0 runtime artifacts (per-machine wiring baselines, audit logs, frames)
+spikes/s0-camera-path-stability/state/
+spikes/s0-camera-path-stability/frames/
+
+# S1 trigger captures — transient per-run debug snapshots, not curated data.
+# Curated reference sets (baseline/, templates/) stay tracked.
+/captures/
+
+# Setup app per-machine runtime state (config, captured templates, snapshots)
+setup/setup_state/
+setup/.pytest_cache/
+
+# Editors / OS
+.DS_Store
+Thumbs.db

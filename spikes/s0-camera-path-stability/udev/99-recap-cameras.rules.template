@@ -1,0 +1,31 @@
+# ReCap — stable per-station camera symlinks for the X-10 press.
+#
+# Why: /dev/videoN numbering is not stable across reboots or replugs, and
+# cheap borehole cameras ship DUPLICATE USB serials (observed: identical
+# across units — spike Findings F2), so /dev/v4l/by-id is unsafe. The
+# physical USB port is the stable identity; these rules pin each press
+# station to its port.
+#
+# Install (on the Pi):
+#   1. Run  ./audit_paths.py --list  and note each camera's port value
+#      (e.g. 1-1.2.4). Cameras must be wired one per station and never
+#      moved afterwards.
+#   2. Copy this file to /etc/udev/rules.d/99-recap-cameras.rules and
+#      replace every <port-station-NN> placeholder with the real port.
+#   3. sudo udevadm control --reload && sudo udevadm trigger
+#   4. Verify: ls -l /dev/recap-cam/
+#
+# Note: ATTR{index}=="0" selects the UVC capture node. Each endoscope
+# exposes index 0 (capture) and index 1 (metadata); confirm with
+# ./audit_paths.py --list.
+
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-01>", ATTR{index}=="0", SYMLINK+="recap-cam/station-01"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-02>", ATTR{index}=="0", SYMLINK+="recap-cam/station-02"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-03>", ATTR{index}=="0", SYMLINK+="recap-cam/station-03"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-04>", ATTR{index}=="0", SYMLINK+="recap-cam/station-04"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-05>", ATTR{index}=="0", SYMLINK+="recap-cam/station-05"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-06>", ATTR{index}=="0", SYMLINK+="recap-cam/station-06"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-07>", ATTR{index}=="0", SYMLINK+="recap-cam/station-07"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-08>", ATTR{index}=="0", SYMLINK+="recap-cam/station-08"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-09>", ATTR{index}=="0", SYMLINK+="recap-cam/station-09"
+SUBSYSTEM=="video4linux", KERNEL=="video*", KERNELS=="<port-station-10>", ATTR{index}=="0", SYMLINK+="recap-cam/station-10"

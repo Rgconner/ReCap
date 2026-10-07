@@ -1,0 +1,5 @@
+line-length = 120
+target-version = "py311"  # matches docs/phase-0-research-plan.md's Pi CV-stack target
+
+[lint]
+select = ["E", "F"]

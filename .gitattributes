@@ -1,0 +1,11 @@
+# ReCap is developed on Windows but deployed to Linux (Raspberry Pi).
+# Operational files MUST stay LF in the repo and the working tree —
+# CRLF breaks shell shebangs, udev rule parsing, and systemd units.
+
+*.sh       text eol=lf
+*.py       text eol=lf
+*.rules    text eol=lf
+*.template text eol=lf
+*.service  text eol=lf
+*.timer    text eol=lf
+*.env      text eol=lf

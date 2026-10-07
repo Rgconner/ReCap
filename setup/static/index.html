@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>ReCap Setup</title>
+    <script src='https://cdn.tailwindcss.com'></script>
+    <style>
+        body {
+            background-color: #161616;
+            color: #f4f4f4;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+        .card {
+            background-color: #262626;
+            border: 1px solid #393939;
+        }
+        .btn-primary {
+            background-color: #0f62fe;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0353e9;
+        }
+        .btn-secondary {
+            background-color: #393939;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #474747;
+        }
+        .input-field {
+            background-color: #161616;
+            border: 1px solid #393939;
+            color: white;
+        }
+        .input-field:focus {
+            border-color: #0f62fe;
+            outline: none;
+        }
+        .alarm-ok {
+            border-color: #393939;
+        }
+        .alarm-latched {
+            border-color: #da1e28;
+            background-color: #2d1a1a;
+        }
+    </style>
+</head>
+<body class='p-8'>
+    <div class='max-w-6xl mx-auto'>
+        <header class='mb-8 border-b border-gray-700 pb-4'>
+            <h1 class='text-3xl font-bold'>ReCap Setup</h1>
+            <p class='text-gray-400'>Manage camera identity, ROIs, and templates.</p>
+        </header>
+
+        <section class='card p-4 rounded mb-6'>
+            <div class='flex flex-wrap items-center gap-3'>
+                <label class='text-sm text-gray-400' for='setupToken'>Setup Token</label>
+                <input id='setupToken' type='password' class='input-field p-2 rounded text-sm flex-1 min-w-[12rem]' placeholder='paste your RECAP_SETUP_TOKEN'>
+                <button id='connectToken' class='btn-secondary px-4 py-2 rounded text-sm'>Connect</button>
+            </div>
+            <p id='statusMsg' class='text-sm text-gray-500 mt-2'></p>
+        </section>
+
+        <section id='alarmStateBox' class='card alarm-ok p-4 rounded mb-6 flex flex-wrap items-center justify-between gap-3'>
+            <div>
+                <span class='text-sm text-gray-400'>Alarm State</span>
+                <p id='alarmStateText' class='text-lg font-semibold'>No data yet</p>
+            </div>
+            <button id='clearAlarm' class='btn-primary px-4 py-2 rounded text-sm hidden'>Clear / Acknowledge</button>
+        </section>
+
+        <div class='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+            <!-- Left Column: Camera & Config -->
+            <div class='space-y-8'>
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Camera Identity</h2>
+                    <div class='space-y-4'>
+                        <div>
+                            <label class='block text-sm text-gray-400 mb-1'>Select Camera</label>
+                            <select id='cameraSelect' class='input-field w-full p-2 rounded'></select>
+                        </div>
+                        <button id='refreshCameras' class='btn-secondary w-full py-2 rounded text-sm'>Refresh Cameras</button>
+                    </div>
+                </section>
+
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Live Snapshot</h2>
+                    <div class='aspect-video bg-black rounded overflow-hidden mb-2 flex items-center justify-center relative'>
+                        <img id='snapshotImg' src='' alt='Snapshot' class='max-w-full max-h-full hidden'>
+                        <canvas id='roiOverlay' class='absolute pointer-events-none hidden'></canvas>
+                        <span id='snapshotPlaceholder' class='text-gray-600'>No snapshot</span>
+                    </div>
+                    <p id='snapshotResolution' class='text-xs text-gray-500 mb-4'></p>
+                    <button id='takeSnapshot' class='btn-primary w-full py-2 rounded text-sm'>Take Snapshot</button>
+                </section>
+
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Alignment Markers</h2>
+                    <p class='text-sm text-gray-400 mb-3'>Two reference points (e.g. yellow marker centers) used to detect camera drift between cycles.</p>
+                    <div id='alignmentList' class='space-y-2 mb-4'></div>
+                    <button id='addAlignmentMarker' class='btn-secondary w-full py-2 rounded text-sm'>+ Add Marker</button>
+                </section>
+            </div>
+
+            <!-- Middle Column: ROI Management -->
+            <div class='space-y-8 lg:col-span-1'>
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>ROI Definitions</h2>
+                    <div id='roiList' class='space-y-3 mb-4'>
+                        <!-- ROI items will be injected here -->
+                    </div>
+                    <button id='addRoi' class='btn-secondary w-full py-2 rounded text-sm'>+ Add ROI</button>
+                </section>
+
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Templates</h2>
+                    <div id='templateList' class='space-y-3'>
+                        <!-- Templates will be injected here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Actions -->
+            <div class='space-y-8'>
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Capture Workflow</h2>
+                    <div class='space-y-4'>
+                        <div class='p-4 bg-gray-800 rounded'>
+                            <p class='text-sm text-gray-400 mb-2'>Select an ROI to capture its template:</p>
+                            <select id='captureRoiSelect' class='input-field w-full p-2 rounded mb-3'></select>
+                            <div class='flex gap-2'>
+                                <button id='capturePresent' class='btn-primary flex-1 py-2 rounded text-xs'>Capture Present</button>
+                                <button id='captureAbsent' class='btn-secondary flex-1 py-2 rounded text-xs'>Capture Absent</button>
+                            </div>
+                            <p id='captureStatus' class='text-sm mt-2 min-h-[1.25rem]'></p>
+                        </div>
+                        <button id='saveConfig' class='btn-primary w-full py-2 rounded text-sm'>Save Configuration</button>
+                    </div>
+                </section>
+
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Alarm Outputs</h2>
+                    <p class='text-sm text-gray-400 mb-3'>GPIO pins wired to short one of the press's alarm jacks. "Active high" means driving the pin HIGH engages it.</p>
+                    <div id='alarmOutputList' class='space-y-2 mb-4'></div>
+                    <button id='addAlarmOutput' class='btn-secondary w-full py-2 rounded text-sm'>+ Add Output</button>
+                </section>
+
+                <section class='card p-6 rounded'>
+                    <h2 class='text-xl font-semibold mb-4'>Alarm Policies</h2>
+                    <p class='text-sm text-gray-400 mb-3'>Which outputs fire for a WARN vs. STOP condition, and whether they pulse briefly or latch until cleared.</p>
+                    <div id='alarmPolicyList' class='space-y-2 mb-4'></div>
+                    <button id='addAlarmPolicy' class='btn-secondary w-full py-2 rounded text-sm'>+ Add Policy</button>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src='/static/app.js'></script>
+</body>
+</html>
